@@ -13,15 +13,15 @@ class Noticias{
     public function __construct($db){
         $this -> conn = $db;
     }   
-        public function registrar($titulo, $noticia, $data, $autor, $imagem){
-            $query = "INSERT INTO " . $this->table_name . " (titulo, noticia, data, autor, imagem) VALUES (?, ?, ?, ?, ?)";
+        public function registrar($titulo, $noticia, $data, $autor, $categoria, $imagem){
+            $query = "INSERT INTO " . $this->table_name . " (titulo, noticia, data, autor, categoria, imagem) VALUES (?, ?, ?, ?, ?, ?)";
             $stmt = $this->conn->prepare($query);
-            $stmt->execute([$titulo, $noticia, $data, $autor, $imagem]);
+            $stmt->execute([$titulo, $noticia, $data, $autor, $categoria, $imagem]);
             return $stmt;
         }
 
-        public function criar($titulo, $noticia, $data, $autor, $imagem){
-            return $this->registrar($titulo, $noticia, $data, $autor, $imagem);
+        public function criar($titulo, $noticia, $data, $autor, $categoria_id, $imagem){
+            return $this->registrar($titulo, $noticia, $data, $autor, $categoria_id, $imagem);
         }
         
         public function ler() {

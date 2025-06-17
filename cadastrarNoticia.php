@@ -28,7 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $imagem = trim($_POST['imagem_url']);
     }
 
-    $noticias->criar($titulo, $noticia, $data, $autor, $imagem, $categoria_id);
+    $noticias->criar($titulo, $noticia, $data, $autor, $categoria_id, $imagem);
     header('Location: portal.php');
     exit();
 }

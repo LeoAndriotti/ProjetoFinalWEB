@@ -56,7 +56,7 @@ function saudacao() {
             <h1><span class="saudacao-portal"><?php echo saudacao(); ?></span>, <?php echo $nome_usuario; ?>!</h1>
             <div class="portal-nav">
                 <a href="alterar.php?id=<?php echo $usuario_id; ?>"><i class="fas fa-user-edit"></i> Editar Usuário</a>
-                <a href="logout.php"><i class="fas fa-sign-out-alt"></i> Sair</a>
+                <a href="indexUsuario.php"><i class="fas fa-sign-out-alt"></i> Voltar</a>
             </div>
         </div>
     </div>
@@ -151,6 +151,12 @@ function saudacao() {
                     <div class="modal-noticia-meta">
                         <span class="modal-noticia-date">
                             <i class="fas fa-calendar"></i> ${dataFormatada}
+                            <?php 
+                                $cat = $categoria->lerPorId($noticia['categoria']);
+                                echo '<i class="fas fa-tag"></i> ' . htmlspecialchars($cat['nome'] ?? 'Sem categoria');
+                            ?>
+
+
                         </span>
                     </div>
                 </div>

@@ -24,7 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['entrar'])) {
 
     if ($usuario_data && password_verify($senha, $usuario_data['senha'])) {
         $_SESSION['usuario_id'] = $usuario_data['id'];
-        header('Location: indexUsuario.php');
+        header('Location: portal.php');
         exit();
     } else {
         $erro_login = 'Email ou senha inválidos';
@@ -67,7 +67,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['entrar'])) {
                     <span class="currency-value" id="gbp-value">Carregando...</span>
                 </div>
             </div>
-            <button class="login-btn" onclick="openModal()">Entrar</button>
+           <div class="index-nav">
+                <a href="portal.php" class="login-btn">Meu Portal</a>
+                <a href="logout.php" class="logout-btn"> Sair</a>
+            </div>
         </div>
     </div>
 
@@ -134,9 +137,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['entrar'])) {
             <?php endif; ?>
         </section>
 
-        <!-- Exibir as 5 últimas notícias -->
         <section class="ultimas-noticias">
-            <h2>Últimas Notícias</h2>
+            <h2>Todas Noticias</h2>
             <?php if (!empty($ultimas_noticias)): ?>
                 <div class="news-grid">
                     <?php foreach ($ultimas_noticias as $noticia): ?>
@@ -187,31 +189,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['entrar'])) {
         </section>
     </main>
 
-    <div class="modal" id="loginModal">
-        <div class="modal-content">
-            <span class="close-modal" onclick="closeModal()">&times;</span>
-            <form method="POST">
-                <div class="form-group">
-                    <label for="email">Email</label>
-                    <input type="email" name="email" id="email" required placeholder="Seu email">
-                </div>
-                <div class="form-group">
-                    <label for="senha">Senha</label>
-                    <input type="password" name="senha" id="senha" required placeholder="Sua senha">
-                </div>
-                <button type="submit" name="entrar" class="submit-btn">Entrar</button>
-            </form>
-            <div class="register-link">
-                <p style="color: black;">Não tem uma conta? <a href="./registrar.php">Registre-se aqui</a></p>
-            </div>
-            
-            <?php if (!empty($erro_login)): ?>
-                <div class="login-error"><?php echo $erro_login; ?></div>
-            <?php endif; ?>
-        </div>
-    </div>
-
-    <!-- Modal da Notícia -->
     <div class="modal-noticia" id="noticiaModal">
         <div class="modal-noticia-content">
             <span class="close-modal-noticia" onclick="closeNoticiaModal()">&times;</span>
@@ -253,22 +230,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['entrar'])) {
             &copy; <?php echo date('Y'); ?> CSL Times. Todos os direitos reservados.
         </div>
     </footer>
-
+                                    
     <script>
-        // Add scroll event listener to show/hide footer
-        window.addEventListener('scroll', function() {
-            const footer = document.querySelector('.footer-main');
-            const scrollPosition = window.scrollY + window.innerHeight;
-            const documentHeight = document.documentElement.scrollHeight;
-            
-            // Show footer when user is near the bottom (within 100px)
-            if (documentHeight - scrollPosition < 100) {
-                footer.style.display = 'block';
-            } else {
-                footer.style.display = 'none';
-            }
-        });
-
         async function updateCurrencies() {
             try {
                 const response = await fetch('https://economia.awesomeapi.com.br/json/last/USD-BRL,EUR-BRL,BTC-BRL,GBP-BRL');
@@ -288,6 +251,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['entrar'])) {
 
         updateCurrencies();
         setInterval(updateCurrencies, 300000);
+
+        // Adicionar event listener para mostrar/esconder o footer
+        window.addEventListener('scroll', function() {
+            const footer = document.querySelector('.footer-main');
+            const scrollPosition = window.scrollY + window.innerHeight;
+            const documentHeight = document.documentElement.scrollHeight;
+            
+            // Mostrar footer quando estiver próximo do final (dentro de 100px)
+            if (documentHeight - scrollPosition < 100) {
+                footer.style.display = 'block';
+            } else {
+                footer.style.display = 'none';
+            }
+        });
 
         function openModal() {
             document.getElementById('loginModal').classList.add('active');
@@ -310,12 +287,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['entrar'])) {
             }
         });
 
-        // Funções para o modal da notícia
         function openNoticiaModal(noticia, autor, categoria) {
-            // Preencher o modal com os dados da notícia
             document.getElementById('modal-noticia-titulo').textContent = noticia.titulo;
             
-            // Formatar a data no formato brasileiro
             const data = new Date(noticia.data);
             const dataFormatada = data.toLocaleDateString('pt-BR', {
                 day: '2-digit',
@@ -328,7 +302,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['entrar'])) {
             document.getElementById('modal-noticia-categoria').textContent = categoria;
             document.getElementById('modal-noticia-conteudo').textContent = noticia.noticia;
             
-            // Configurar a imagem se existir
             const imagemContainer = document.getElementById('modal-noticia-imagem-container');
             const imagem = document.getElementById('modal-noticia-imagem');
             
@@ -347,7 +320,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['entrar'])) {
                 imagemContainer.style.display = 'none';
             }
             
-            // Exibir o modal
             document.getElementById('noticiaModal').style.display = 'flex';
         }
 
@@ -355,7 +327,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['entrar'])) {
             document.getElementById('noticiaModal').style.display = 'none';
         }
 
-        // Fechar modal da notícia ao clicar fora dele
         window.addEventListener('click', function(event) {
             const noticiaModal = document.getElementById('noticiaModal');
             if (event.target === noticiaModal) {
