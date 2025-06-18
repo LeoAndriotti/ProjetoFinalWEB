@@ -244,6 +244,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['entrar'])) {
         </div>
     </div>
 
+    <!-- Modal de Alteração de  -->
     <div class="modal" id="modalSenha">
         <div class="modal-content">
             <span class="close-modal" onclick="closeModalSenha()">&times;</span>
@@ -254,8 +255,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['entrar'])) {
                     <input type="email" name="email_senha" id="email_senha" required placeholder="Digite seu email">
                 </div>
                 <div class="form-group">
+                    <label for="senha_atual">Senha Atual</label>
+                    <input type="password" name="senha_atual" id="senha_atual" required placeholder="Digite sua senha atual">
+                </div>
+                <div class="form-group">
                     <label for="nova_senha">Nova Senha</label>
                     <input type="password" name="nova_senha" id="nova_senha" required placeholder="Digite a nova senha">
+                </div>
+                <div class="form-group">
+                    <label for="confirmar_senha">Confirmar Nova Senha</label>
+                    <input type="password" name="confirmar_senha" id="confirmar_senha" required placeholder="Confirme a nova senha">
                 </div>
                 <button type="submit" name="alterar_senha" class="submit-btn">
                     <i class="fas fa-save"></i> Alterar Senha
