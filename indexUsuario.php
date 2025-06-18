@@ -252,20 +252,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['entrar'])) {
         updateCurrencies();
         setInterval(updateCurrencies, 300000);
 
-        // Adicionar event listener para mostrar/esconder o footer
-        window.addEventListener('scroll', function() {
-            const footer = document.querySelector('.footer-main');
-            const scrollPosition = window.scrollY + window.innerHeight;
-            const documentHeight = document.documentElement.scrollHeight;
-            
-            // Mostrar footer quando estiver próximo do final (dentro de 100px)
-            if (documentHeight - scrollPosition < 100) {
-                footer.style.display = 'block';
-            } else {
-                footer.style.display = 'none';
-            }
-        });
-
         function openModal() {
             document.getElementById('loginModal').classList.add('active');
         }

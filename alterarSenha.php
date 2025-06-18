@@ -1,46 +1,52 @@
 <?php
+session_start();
+if(!isset($_SESSION['usuario_id'])) {
+    header('Location: index.php');
+    exit();
+}
 include_once './config/config.php';
 include_once './classes/Usuario.php';
+$usuario = new Usuario($db);
 
-$erro = '';
-$sucesso = '';
+// Verifica se o ID foi fornecido e se corresponde ao usuário logado
+if (!isset($_GET['id']) || $_GET['id'] != $_SESSION['usuario_id']) {
+    header('Location: portal.php');
+    exit();
+}
+
+$id = $_GET['id'];
+$row = $usuario->lerPorId($id);
+
+if (!$row) {
+    header('Location: portal.php');
+    exit();
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $usuario = new Usuario($db);
     $nome = $_POST['nome'];
     $sexo = $_POST['sexo'];
     $fone = $_POST['fone'];
     $email = $_POST['email'];
-    $senha = $_POST['senha'];
-    
-    // Verificar se o email já existe
-    $usuario_existente = $usuario->buscarPorEmail($email);
-    
-    if ($usuario_existente) {
-        $erro = 'Este email já está cadastrado. Por favor, use outro email.';
-    } else {
-        $usuario->criar($nome, $sexo, $fone, $email, $senha);
-        $sucesso = 'Usuário cadastrado com sucesso!';
-        // Redirecionar após 2 segundos
-        header('refresh:2;url=portal.php');
-    }
+    $usuario->atualizar($id, $nome, $sexo, $fone, $email);
+    header('Location: portal.php');
+    exit();
 }
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Adicionar Usuário - CSL Times</title>
+    <title>Editar Usuário - CSL Times</title>
     <link rel="stylesheet" href="./uploads/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="icon" href="./assets/img/logo.png" type="image/png">
-
 </head>
 <body class="portal-body">
     <div class="portal-header portal-header-portal">
-        <div class="portal-logo">CSL Times</div>
+    <img src="./assets/img/logo2.png" alt="CSL Times" class="portal-logo-img" style="width: 120px; height: 100px;">
+
         <div class="portal-header-content">
-            <h1>Adicionar Novo Usuário</h1>
+            <h1>Editar Usuário</h1>
             <div class="portal-nav">
                 <a href="portal.php"><i class="fas fa-arrow-left"></i> Voltar</a>
             </div>
@@ -48,38 +54,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
 
     <div class="form-card">
-        <?php if (!empty($erro)): ?>
-            <div class="error-message" style="background-color: #ffebee; color: #c62828; padding: 15px; border-radius: 5px; margin-bottom: 20px; border: 1px solid #ffcdd2;">
-                <i class="fas fa-exclamation-circle"></i> <?php echo $erro; ?>
-            </div>
-        <?php endif; ?>
-        
-        <?php if (!empty($sucesso)): ?>
-            <div class="success-message" style="background-color: #e8f5e8; color: #2e7d32; padding: 15px; border-radius: 5px; margin-bottom: 20px; border: 1px solid #c8e6c9;">
-                <i class="fas fa-check-circle"></i> <?php echo $sucesso; ?>
-            </div>
-        <?php endif; ?>
-
         <form method="POST" class="portal-form">
             <div class="form-header">
-                <i class="fa-solid fa-user-plus"></i>
-                <h2>Cadastro de Usuário</h2>
+                <i class="fa-solid fa-user-edit"></i>
+                <h2>Editar Dados do Usuário</h2>
             </div>
 
+            <input type="hidden" name="id" value="<?php echo htmlspecialchars($row['id']); ?>">
+            
             <div class="form-group">
                 <label for="nome"><i class="fas fa-user"></i> Nome:</label>
-                <input type="text" name="nome" id="nome" required>
+                <input type="text" name="nome" id="nome" value="<?php echo htmlspecialchars($row['nome']); ?>" required>
             </div>
 
             <div class="form-group">
                 <label><i class="fas fa-venus-mars"></i> Sexo:</label>
                 <div class="form-row">
-                    <label for="masculino">
-                        <input type="radio" id="masculino" name="sexo" value="M" required>
+                    <label for="masculino_editar">
+                        <input type="radio" id="masculino_editar" name="sexo" value="M" <?php echo ($row['sexo'] === 'M') ? 'checked' : ''; ?> required>
                         <i class="fa-solid fa-mars"></i> Masculino
                     </label>
-                    <label for="feminino">
-                        <input type="radio" id="feminino" name="sexo" value="F" required>
+                    <label for="feminino_editar">
+                        <input type="radio" id="feminino_editar" name="sexo" value="F" <?php echo ($row['sexo'] === 'F') ? 'checked' : ''; ?> required>
                         <i class="fa-solid fa-venus"></i> Feminino
                     </label>
                 </div>
@@ -87,21 +83,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             <div class="form-group">
                 <label for="fone"><i class="fas fa-phone"></i> Telefone:</label>
-                <input type="text" name="fone" id="fone" required>
+                <input type="text" name="fone" id="fone" value="<?php echo htmlspecialchars($row['fone']); ?>" required>
             </div>
 
             <div class="form-group">
                 <label for="email"><i class="fas fa-envelope"></i> Email:</label>
-                <input type="email" name="email" id="email" required>
-            </div>
-
-            <div class="form-group">
-                <label for="senha"><i class="fas fa-lock"></i> Senha:</label>
-                <input type="password" name="senha" id="senha" required>
+                <input type="email" name="email" id="email" value="<?php echo htmlspecialchars($row['email']); ?>" required>
             </div>
 
             <button type="submit" class="submit-btn">
-                <i class="fas fa-plus"></i> Adicionar Usuário
+                <i class="fas fa-save"></i> Salvar Alterações
             </button>
         </form>
     </div>

@@ -144,7 +144,6 @@ function saudacao() {
                 }
             }
             
-            // Criar o HTML do modal
             let html = `
                 <div class="modal-noticia-header">
                     <h2>${noticia.titulo}</h2>
@@ -158,7 +157,7 @@ function saudacao() {
 
 
                         </span>
-                    </div>
+                    </div>  
                 </div>
             `;
             

@@ -1217,13 +1217,23 @@ body {
 }
 
 .login-error {
-    color: #fff;
-    background: #d9534f;
-    padding: 10px 20px;
-    border-radius: 4px;
-    margin-bottom: 15px;
+    background-color: #ffebee;
+    color: #c62828;
+    padding: 10px;
+    border-radius: 5px;
+    margin-top: 10px;
     text-align: center;
-    font-weight: bold;
+    border: 1px solid #ffcdd2;
+}
+
+.login-success {
+    background-color: #e8f5e8;
+    color: #2e7d32;
+    padding: 10px;
+    border-radius: 5px;
+    margin-top: 10px;
+    text-align: center;
+    border: 1px solid #c8e6c9;
 }
 
 /* Estilos para o modal da notícia */

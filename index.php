@@ -15,6 +15,38 @@ $todas_noticias = $noticias->ler();
 $ultimas_noticias = $db->query("SELECT * FROM noticias ORDER BY data DESC, id DESC LIMIT 5")->fetchAll(PDO::FETCH_ASSOC);
 
 $erro_login = '';
+$erro_senha = '';
+$sucesso_senha = '';
+
+// Processar alteração de senha
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['alterar_senha'])) {
+    $email = $_POST['email_senha'];
+    $senha_atual = $_POST['senha_atual'];
+    $nova_senha = $_POST['nova_senha'];
+    $confirmar_senha = $_POST['confirmar_senha'];
+    
+    // Verificar se as senhas coincidem
+    if ($nova_senha !== $confirmar_senha) {
+        $erro_senha = 'As senhas não coincidem.';
+    } else {
+        // Buscar usuário pelo email
+        $usuario_data = $usuario->buscarPorEmail($email);
+        
+        if ($usuario_data && password_verify($senha_atual, $usuario_data['senha'])) {
+            // Atualizar a senha
+            $nova_senha_hash = password_hash($nova_senha, PASSWORD_BCRYPT);
+            $stmt = $db->prepare("UPDATE usuarios SET senha = ? WHERE email = ?");
+            if ($stmt->execute([$nova_senha_hash, $email])) {
+                $sucesso_senha = 'Senha alterada com sucesso!';
+            } else {
+                $erro_senha = 'Erro ao alterar a senha.';
+            }
+        } else {
+            $erro_senha = 'Email ou senha atual incorretos.';
+        }
+    }
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['entrar'])) {
     $email = $_POST['email'];
     $senha = $_POST['senha'];
@@ -203,10 +235,42 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['entrar'])) {
             </form>
             <div class="register-link">
                 <p style="color: black;">Não tem uma conta? <a href="./registrar.php">Registre-se aqui</a></p>
+                <p style="color: black;">Esqueceu a senha? <a href="#" onclick="openModalSenha(); return false;">Alterar Senha</a></p>
             </div>
             
             <?php if (!empty($erro_login)): ?>
                 <div class="login-error"><?php echo $erro_login; ?></div>
+            <?php endif; ?>
+        </div>
+    </div>
+
+    <div class="modal" id="modalSenha">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModalSenha()">&times;</span>
+            <h2><i class="fas fa-key"></i> Alterar Senha</h2>
+            <form method="POST" id="formAlterarSenha">
+                <div class="form-group">
+                    <label for="email_senha">Email</label>
+                    <input type="email" name="email_senha" id="email_senha" required placeholder="Digite seu email">
+                </div>
+                <div class="form-group">
+                    <label for="nova_senha">Nova Senha</label>
+                    <input type="password" name="nova_senha" id="nova_senha" required placeholder="Digite a nova senha">
+                </div>
+                <button type="submit" name="alterar_senha" class="submit-btn">
+                    <i class="fas fa-save"></i> Alterar Senha
+                </button>
+            </form>
+            <div class="register-link">
+                <p style="color: black;">Lembrou sua senha? <a href="#" onclick="closeModalSenha(); openModal(); return false;">Fazer Login</a></p>
+            </div>
+            
+            <?php if (!empty($erro_senha)): ?>
+                <div class="login-error"><?php echo $erro_senha; ?></div>
+            <?php endif; ?>
+            
+            <?php if (!empty($sucesso_senha)): ?>
+                <div class="login-success"><?php echo $sucesso_senha; ?></div>
             <?php endif; ?>
         </div>
     </div>
@@ -297,16 +361,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['entrar'])) {
             document.getElementById('loginModal').classList.remove('active');
         }
 
+        function openModalSenha() {
+            document.getElementById('modalSenha').classList.add('active');
+        }
+
+        function closeModalSenha() {
+            document.getElementById('modalSenha').classList.remove('active');
+        }
+
         window.onclick = function(event) {
-            const modal = document.getElementById('loginModal');
-            if (event.target == modal) {
+            const loginModal = document.getElementById('loginModal');
+            const senhaModal = document.getElementById('modalSenha');
+            
+            if (event.target == loginModal) {
                 closeModal();
+            }
+            if (event.target == senhaModal) {
+                closeModalSenha();
             }
         }
 
         document.addEventListener('keydown', function(event) {
             if (event.key === 'Escape') {
                 closeModal();
+                closeModalSenha();
             }
         });
 
